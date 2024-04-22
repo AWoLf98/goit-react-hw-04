@@ -1,7 +1,7 @@
 
-const ErrorMessage = ({msg}) => {
+const ErrorMessage = () => {
     return (
-        <p>{msg}</p>
+        <p>Something went wrong</p>
     );
 }
 
