@@ -10,6 +10,7 @@ import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import ImageModal from './components/ImageModal/ImageModal';
 
 import fetchPhotos from './apiService/unsplashApi';
+import { useInView } from 'react-intersection-observer';
 
 function App() {
   const [filter, setFilter] = useState('');
@@ -17,21 +18,18 @@ function App() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(false);
+
+  //modal
   const [isModalOpen, setisModalOpen] = useState(false);
+  //modal img
   const [imgSrc, setImgSrc] = useState('');
   const [imgAlt, setImgAlt] = useState('');
 
-  let options = {
-    root: document.querySelector('#root'),
-    rootMargin: '0px',
-    threshold: 1.0,
-  };
-
-  new IntersectionObserver(() => {
-    setPage(prev => {
-      return prev + 1;
-    });
-  }, options);
+  //Infinity scroll
+  const [hasMore, setHasMore] = useState(true);
+  const { ref, inView } = useInView({
+    threshold: 0
+  });
 
   useEffect(() => {
     async function callFetchPhotos() {
@@ -43,15 +41,38 @@ function App() {
         setLoading(true);
         setErr(false);
         const data = await fetchPhotos(filter, page);
-        setPhotos(data.results);
+        setPage(prevPage => prevPage + 1);
+        setPhotos(prevItems => [...prevItems, ...data.results]);
+        console.log(data.results);
       } catch {
         setErr(true);
-      } finally {
-        setLoading(false);
       }
     }
     callFetchPhotos();
   }, [filter, page]);
+
+  //Infinity scroll
+  useEffect(() => {
+    async function updateData() {
+      try {
+        if (!filter) {
+          return;
+        }
+        console.log(inView);
+        if ( loading && photos && inView && hasMore && page != 2 && page != 1) {
+          setLoading(false);
+          const data = await fetchPhotos(filter, page);
+          setPage(prevPage => prevPage + 1);
+          setPhotos(prevItems => [...prevItems, ...data.results]);
+          setHasMore(data.next != null);
+          // setLoading(true);
+        }
+      } catch {
+        setErr(true);
+      }
+    }
+    updateData();
+  }, [inView, hasMore, page, filter, photos]);
 
   function changeFilter(value) {
     setFilter(value);
@@ -62,7 +83,7 @@ function App() {
   }
 
   function handleOpenModal(currImg, currAlt) {
-    console.log(currImg);
+    // console.log(currImg);
     setImgSrc(currImg);
     setImgAlt(currAlt);
     setisModalOpen(prev => !prev);
@@ -74,7 +95,8 @@ function App() {
       {err && <ErrorMessage />}
       {/* щоб нуля не було */}
       {!!photos.length && <ImageGallery photos={photos} openModal={handleOpenModal} />}
-      <Loader visible={loading} />
+       {loading && <p ref={ref}>load</p>}
+      {/* <Loader ref={ref} visible={loading} /> */}
       {imgSrc && (
         <ImageModal
           isOpen={isModalOpen}
