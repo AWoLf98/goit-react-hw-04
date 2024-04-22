@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "components/*": ["components/*"],
+      "apiService/*": ["/src/apiService/*"]
+    }
+  },
+  "include": ["src"]
+}

@@ -1,9 +1,9 @@
-import css from './SearchBar.module.css';
 import toast, { Toaster } from 'react-hot-toast';
 import { IoSearchOutline } from "react-icons/io5";
 
+import css from './SearchBar.module.css';
 
-const SearchBar = () => {
+const SearchBar = ({changeFilter}) => {
     function handleSubmit(evt) { 
         evt.preventDefault();
         const { searchBar } = evt.target.elements;
@@ -11,7 +11,10 @@ const SearchBar = () => {
             toast.error('You must write some text!');
             return;
         }
+        changeFilter(searchBar.value.trim());
+        evt.target.reset();
     }
+    
   return (
     <header className={css['search-form']}>
       <form onSubmit={handleSubmit}>
