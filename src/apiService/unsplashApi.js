@@ -7,13 +7,32 @@ axios.defaults.headers.common['Authorization'] =
 
 axios.defaults.params = { per_page: 15 };
 
-export default async function fetchPhotos(query, page) {
-  console.log(query);
+export default async function fetchPhotos(
+  query,
+  page,
+  orientation,
+  color,
+  content_filter,
+  order_by
+) {
+  const options = {
+    query,
+    page,
+    content_filter,
+    order_by,
+  };
+
+  if (orientation) {
+    options['orientation'] = orientation;
+  }
+
+  if (color) {
+    options['color'] = color;
+  }
+
   const response = await axios.get('/search/photos', {
-    params: {
-      query,
-      page,
-    },
+    params: options,
   });
+
   return response.data;
 }

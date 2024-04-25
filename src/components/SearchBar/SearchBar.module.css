@@ -2,13 +2,13 @@
     width: 100%;
     padding: 5px;
     background-color: blueviolet;
-    margin-bottom: 24px;
 }
 
 .search-bar {
     height: 100%;
     width: 50%;
     padding: 10px 12px;
+    background-color: #242424;
 }
 
 .search-bar,
