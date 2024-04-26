@@ -9,7 +9,7 @@ const ImageCard = ({ urls, user: { username }, likes, description, openModal }) 
         openModal(urls.regular, alt);
       }}
     >
-      <img className={css.img} src={urls.small} alt={alt} />
+      <img className={css.img} src={urls.small} alt={alt} loading='lazzy'/>
       <div className={css['img-card']}>
         <span>Likes: {likes} </span>
         <span>User: {username}</span>
