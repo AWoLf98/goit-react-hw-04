@@ -34,5 +34,9 @@ export default async function fetchPhotos(
     params: options,
   });
 
+  // це залишаю чисто показати що іноді сервер повертає менше 15 фото (Наприклад при запиті cats 2 сторінка в мене повертає 14)
+  console.log(query, page, orientation, color, content_filter, order_by)
+  console.log(response.data);
+
   return response.data;
 }

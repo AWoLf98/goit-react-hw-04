@@ -9,6 +9,7 @@ import Loader from './components/Loader/Loader';
 import ErrorMessage from './components/ErrorMessage/ErrorMessage';
 import ImageModal from './components/ImageModal/ImageModal';
 import Filters from './components/Filters/Filters';
+// import LoadMoreBtn from './components/LoadMoreBtn/LoadMoreBtn';
 
 import fetchPhotos from './apiService/unsplashApi';
 import { useInView } from 'react-intersection-observer';
@@ -16,6 +17,8 @@ import { useInView } from 'react-intersection-observer';
 function App() {
   const [query, setQuery] = useState('');
   const [photos, setPhotos] = useState([]);
+  //pagination
+  // const [total_pages, setTotalPages] = useState(0);
 
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -28,71 +31,61 @@ function App() {
   const [order_by, setOrderBy] = useState('relevant');
 
   //modal
-  const [isModalOpen, setisModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   //modal img
   const [imgSrc, setImgSrc] = useState('');
   const [imgAlt, setImgAlt] = useState('');
 
   // Infinity scroll
-  const [hasMore, setHasMore] = useState(true);
   const { ref, inView } = useInView({
-    threshold: 0,
+    threshold: 1,
   });
 
-  //use effect for first search
   useEffect(() => {
     async function callFetchPhotos() {
       try {
         if (!query) {
           return;
         }
-        setPage(1);
+
         setLoading(true);
+
         setErr(false);
-        const data = await fetchPhotos(query, 1, orientation, color, content_filter, order_by);
-        setPhotos(data.results);
+        const data = await fetchPhotos(query, page, orientation, color, content_filter, order_by);
+
+        if(parseInt(data.total_pages) === parseInt(page) || parseInt(data.total_pages) === 0 || parseInt(data.total_pages) === 1) {
+          setLoading(false);
+        }
+
+        if (page > 1) {
+          setPhotos(prevItems => {
+            return [...prevItems, ...data.results];
+          });
+        } else {
+          setPhotos(data.results);
+        }
       } catch {
         setErr(true);
       }
     }
     callFetchPhotos();
-  }, [query, orientation, color, content_filter, order_by]);
+  }, [query, page, orientation, color, content_filter, order_by]);
 
-  // Infinity scroll
-  // useEffect(() => {
-  //   async function updateData() {
-  //     try {
-  //       if (!query) {
-  //         return;
-  //       }
-  //       console.log(inView);
-  //       if (loading && photos && inView && hasMore) {
-  //         // setLoading(false);
-  //         setPage(prevPage => prevPage + 1);
-  //         const data = await fetchPhotos(query, page, orientation, color, content_filter, order_by);
-  //         setPhotos(prevItems => [...prevItems, ...data.results]);
-  //         setHasMore(data.next != null);
-  //         console.log(`Infinity: filter:${query} page: ${page}`);
-  //         // setLoading(true);
-  //       }
-  //     } catch {
-  //       setErr(true);
-  //     }
-  //     finally {
-  //       // setLoading(true);
-  //     }
-  //   }
-  //   // if (inView && loading) {
-  //     updateData();
-  //   // }
-  // }, [inView, hasMore, page]);
+  useEffect(() => {
+    if (inView) {
+      setPage(prevPage => {
+        return prevPage + 1;
+      });
+    }
+  }, [inView]);
 
   function changeQuery(value) {
     setQuery(value);
+    setPage(1);
   }
 
   function handleClose() {
-    setisModalOpen(false);
+    setIsModalOpen(false);
   }
 
   function handleResetFilters() {
@@ -100,12 +93,40 @@ function App() {
     setColor('');
     setContentFilter('low');
     setOrderBy('relevant');
+    setPage(1);
   }
 
   function handleOpenModal(currImg, currAlt) {
     setImgSrc(currImg);
     setImgAlt(currAlt);
-    setisModalOpen(prev => !prev);
+    setIsModalOpen(prev => !prev);
+  }
+
+  // кнопка містить аналогічний функціонал
+  // function loadMore() {
+
+  //   setPage(prevPage => {
+  //     return prevPage + 1;
+  //   });
+  // }
+
+  // вірно фільтри реалізовувати як елементи форми було б згідно тз,
+  // але так як це я додав від себе я виніс функціонал в окрему компоненту
+  function handleSetOrientation(evt) {
+    setOrientation(evt.target.value);
+    setPage(1);
+  }
+  function handleSetColor(evt) {
+    setColor(evt.target.value);
+    setPage(1);
+  }
+  function handleSetContentFilter(evt) {
+    setContentFilter(evt.target.value);
+    setPage(1);
+  }
+  function handleSetOrderBy(evt) {
+    setOrderBy(evt.target.value);
+    setPage(1);
   }
 
   return (
@@ -116,20 +137,21 @@ function App() {
         color={color}
         content_filter={content_filter}
         order_by={order_by}
-        setOrientation={setOrientation}
-        setColor={setColor}
-        setContentFilter={setContentFilter}
-        setOrderBy={setOrderBy}
+        handleSetOrientation={handleSetOrientation}
+        handleSetColor={handleSetColor}
+        handleSetContentFilter={handleSetContentFilter}
+        handleSetOrderBy={handleSetOrderBy}
         resetFilters={handleResetFilters}
       />
 
       {err && <ErrorMessage />}
       {/* щоб нуля не було */}
       {!!photos.length && <ImageGallery photos={photos} openModal={handleOpenModal} />}
-      {/* {loading && <p ref={ref}>load</p>} */}
-      <Loader ref={ref} visible={loading} />
+      {/* <LoadMoreBtn loadMore={loadMore} /> */}
+      {loading && <Loader ref={ref} visible={loading} />}
+      {/* <Loader visible={loading} /> */}
       {imgSrc && (
-        <ImageModal 
+        <ImageModal
           isOpen={isModalOpen}
           imgSrc={imgSrc}
           imgAlt={imgAlt}

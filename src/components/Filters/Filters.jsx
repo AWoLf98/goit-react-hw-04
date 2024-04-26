@@ -5,12 +5,13 @@ const Filters = ({
   color,
   content_filter,
   order_by,
-  setOrientation,
-  setColor,
-  setContentFilter,
-  setOrderBy,
+  handleSetOrientation,
+  handleSetColor,
+  handleSetContentFilter,
+  handleSetOrderBy,
   resetFilters,
 }) => {
+
   return (
     <div className={css.filters}>
       <label className={css.label} htmlFor="orientation">
@@ -20,7 +21,7 @@ const Filters = ({
           value={orientation}
           name="orientation"
           id="orientation"
-          onChange={evt => setOrientation(evt.target.value)}
+          onChange={handleSetOrientation}
         >
           <option value="">-</option>
           <option value="landscape">Landscape</option>
@@ -35,7 +36,7 @@ const Filters = ({
           value={color}
           name="color"
           id="color"
-          onChange={evt => setColor(evt.target.value)}
+          onChange={handleSetColor}
         >
           <option value="">-</option>
           <option value="black_and_white">black and white</option>
@@ -58,7 +59,7 @@ const Filters = ({
           value={content_filter}
           name="content"
           id="content"
-          onChange={evt => setContentFilter(evt.target.value)}
+          onChange={handleSetContentFilter}
         >
           <option value="low">Low</option>
           <option value="high">High</option>
@@ -71,7 +72,7 @@ const Filters = ({
           value={order_by}
           name="order"
           id="order"
-          onChange={evt => setOrderBy(evt.target.value)}
+          onChange={handleSetOrderBy}
         >
           <option value="relevant">Relevant</option>
           <option value="latest">Latest</option>
