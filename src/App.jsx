@@ -18,7 +18,6 @@ function App() {
   const [query, setQuery] = useState('');
   const [photos, setPhotos] = useState([]);
   //pagination
-  // const [total_pages, setTotalPages] = useState(0);
 
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -110,8 +109,8 @@ function App() {
   //   });
   // }
 
-  // вірно фільтри реалізовувати як елементи форми було б згідно тз,
-  // але так як це я додав від себе я виніс функціонал в окрему компоненту
+  // вірно фільтри реалізовувати як елементи форми було б. Але згідно з тз,
+  // і так як це я додав їх від себе я виніс функціонал в окрему компоненту
   function handleSetOrientation(evt) {
     setOrientation(evt.target.value);
     setPage(1);
@@ -147,7 +146,7 @@ function App() {
       {err && <ErrorMessage />}
       {/* щоб нуля не було */}
       {!!photos.length && <ImageGallery photos={photos} openModal={handleOpenModal} />}
-      {/* <LoadMoreBtn loadMore={loadMore} /> */}
+      {/*loading && <LoadMoreBtn loadMore={loadMore} /> */}
       {loading && <Loader ref={ref} visible={loading} />}
       {/* <Loader visible={loading} /> */}
       {imgSrc && (
