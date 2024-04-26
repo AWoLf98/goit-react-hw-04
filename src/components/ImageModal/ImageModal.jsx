@@ -16,6 +16,7 @@ const ImageModal = ({ isOpen, imgSrc, imgAlt, handleClose }) => {
         },
       }}
       isOpen={isOpen}
+      appElement={document.getElementById('root')}
       shouldCloseOnEsc={true}
       shouldCloseOnOverlayClick={true}
       preventScroll={true}
